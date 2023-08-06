@@ -17,12 +17,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'recipes.apps.RecipesConfig',
-    'users.apps.UsersConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
+    'recipes.apps.RecipesConfig',
+    'users.apps.UsersConfig',
+    'api.apps.ApiConfig'
 ]
 
 MIDDLEWARE = [
@@ -97,3 +98,22 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.CustomPaginator',
+    'SEARCH_PARAM': 'name',
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email",'
+}
