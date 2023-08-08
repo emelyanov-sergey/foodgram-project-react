@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -130,36 +131,24 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if not ingredients_list:
             raise ValidationError({
                 'ingredients': 'В рецепте отсутствуют ингредиенты!'})
-
+        used_ingredients = set()
         for ingredient in ingredients_list:
-            if ingredient in ingredients_list:
-                raise ValidationError('Ингредиент не должен повторяться!')
             if int(ingredient['amount']) < 1:
                 raise ValidationError(
                     'Минимальное количество ингредиентов - 1')
-            ingredients_list.append(ingredient)
+            used_ingredients.add(ingredient['id'])
+        if len(used_ingredients) != len(ingredients_list):
+            raise ValidationError('Ингредиент не должен повторяться!')
         return value
 
     def validate_tags(self, value):
-        tags_list = value['tags']
-
-        if not tags_list:
-            raise ValidationError({
-                'tags': 'В рецепте должны быть теги!'})
-
-        for tag in tags_list:
-            if tag in tags_list:
-                raise ValidationError({
-                    'tags': 'Тег не должен повторяться!'})
-            tags_list.append(tag)
-        return value
-
-    def validate_cooking_time(self, value):
-        cooking_time = value['cooking_time']
-
-        if int(cooking_time) < 1:
-            raise ValidationError({
-                'cooking_time': 'Время готовки должно быть не меньше минуты!'})
+        tag_count = Tag.objects.count()
+        if not value or len(value) > tag_count:
+            raise ValidationError(
+                f'Количество тегов должно быть от 1 до {tag_count}.'
+            )
+        if len(value) != len(set(value)):
+            raise ValidationError('Теги не должны повторяться!')
         return value
 
     def create_or_update(self, validated_data, object):
@@ -169,19 +158,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         for ingredient in ingredients:
             current_ingredient = get_object_or_404(Ingredient,
                                                    id=ingredient.get('id'))
-            RecipeIngredient.objects.create(
+            RecipeIngredient.objects.bulk_create(
                 ingredient=current_ingredient,
                 recipe=object,
                 amount=ingredient.get('amount')
             )
         return
 
+    @transaction.atomic
     def create(self, validated_data):
         author = self.context.get('request').user
         recipe = Recipe.objects.create(**validated_data, author=author)
         self.create_or_update(self, validated_data, recipe)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)

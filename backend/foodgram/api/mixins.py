@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 
 class CreateDeleteMixin:
-    def creata_odj(self, serializer_class, data, request):
+    def create_odj(self, serializer_class, data, request):
         serializer = serializer_class(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()

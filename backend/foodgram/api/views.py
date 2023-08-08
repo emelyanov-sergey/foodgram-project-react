@@ -65,7 +65,6 @@ class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (permissions.AllowAny,)
-    pagination_class = None
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -73,7 +72,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (permissions.AllowAny,)
     filterset_class = IngredientFilter
-    pagination_class = None
 
 
 class RecipeViewSet(CreateDeleteMixin, ModelViewSet):

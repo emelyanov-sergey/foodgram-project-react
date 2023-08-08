@@ -9,7 +9,7 @@ class User(AbstractUser):
         unique=True
     )
     email = models.EmailField(
-        verbose_name='Emil',
+        verbose_name='Email',
         max_length=254,
         unique=True
     )
