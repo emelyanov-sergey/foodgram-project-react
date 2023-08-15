@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
+class MyUser(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=150,
@@ -39,18 +39,18 @@ class User(AbstractUser):
         return f'{self.username}: {self.email}'
 
 
-class Subscribe(models.Model):
+class Subscriptions(models.Model):
     user = models.ForeignKey(
-        User,
+        MyUser,
         on_delete=models.CASCADE,
         verbose_name='Подписчик',
-        related_name='follower'
+        related_name='subscriptions_user'
     )
     author = models.ForeignKey(
-        User,
+        MyUser,
         on_delete=models.Case,
         verbose_name='Автор',
-        related_name='following'
+        related_name='subscribers_author'
     )
 
     class Meta:
@@ -58,7 +58,7 @@ class Subscribe(models.Model):
         verbose_name_plural = 'Подписки'
         constraints = [models.UniqueConstraint(
             fields=['user', 'author'],
-            name='unique_following'
+            name='unique_subscription'
         )]
 
     def __str__(self):

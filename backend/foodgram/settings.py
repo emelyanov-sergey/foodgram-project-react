@@ -2,13 +2,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-SECRET_KEY = 'django-insecure-$a57prka*vihap3w10&-(s=i8cz^%ha=xv1)+hq0p32)n$y94+'
+SECRET_KEY = 'django-insecure-ejy!rt_%y5bixt9^(*_qlpj%+b*qe!2a7e2i8*y4wsdir33(!q'
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,9 +19,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
-    'recipes.apps.RecipesConfig',
-    'users.apps.UsersConfig',
-    'api.apps.ApiConfig'
+    'import_export',
+    'users',
+    'recipes',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -64,6 +63,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'users.MyUser'
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -79,11 +80,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'users.User'
+LANGUAGE_CODE = 'en-us'
 
-LANGUAGE_CODE = 'ru'
-
-TIME_ZONE = 'Europe/Moscow'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -92,10 +91,10 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -116,4 +115,15 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.AllowAny'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+    },
+    'SERIALIZERS': {
+        'user_create': 'api.serializers.CustomUserCreateSerializer',
+        'user': 'api.serializers.CustomUserReadSerializer',
+        'current_user': 'api.serializers.CustomUserReadSerializer'},
+    'HIDE_USERS': False,
 }
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
