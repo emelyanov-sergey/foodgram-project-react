@@ -9,31 +9,31 @@ services:
 
   db:
     image: postgres:13.10
-    env_file: ./.env
+    env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
   
   backend:
-    build: ./backend/
-    env_file: ./.env
+    image: emelyanovsergey89/foodgram_backend
+    env_file: .env
     volumes:
       - static:/backend_static
       - media:/app/media
     depends_on:
       - db
-
+    restart: always
+  
   frontend:
-    build: ./frontend
-    env_file: ./.env
+    image: emelyanovsergey89/foodgram_frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
     depends_on:
-      - backend
-
+      - db
+  
   gateway:
-    build: ./infra/
-    env_file: ./.env
+    image: emelyanovsergey89/foodgram_gateway
+    env_file: .env
     volumes:
       - static:/staticfiles/
       - media:/media
@@ -42,4 +42,4 @@ services:
       - 8000:80
     depends_on:
       - backend
-
+    restart: always
